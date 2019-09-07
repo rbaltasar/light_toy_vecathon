@@ -16,6 +16,12 @@ state_tracker<stick_status> stick_state;
 /* LED controller object */
 LEDController LED_controller(&stick_state.val);
 
+/* MPU object */
+
+/* Gesture recognition object */
+
+/* Bluetooth controller */
+
 unsigned long m_last_time_test = 0;
 
 void setup()
@@ -141,7 +147,7 @@ void status_update()
 void loop()
 {
   /* Execute the network loop of the currently used communication handler */
-
+  
   /* Check for status updates */
   status_update();
   /* Check for Gyroscope updates */
