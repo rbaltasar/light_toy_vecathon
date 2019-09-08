@@ -3,13 +3,13 @@
 #define CONFIG_H
 
 //Hardware configuration
-#define NUM_LEDS 38
+#define NUM_LEDS 72
 #define IR_PIN 8
 
 #define NUM_MAX_LAMPS 6
 
 #define LED_BUILTIN 2
-# define LED_PIN 21
+#define LED_PIN 17
 #define COLOR_MODE GRB//GRB
 
 #define R_DEFAULT 255
