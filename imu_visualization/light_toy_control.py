@@ -87,7 +87,7 @@ if __name__== "__main__":
             if(mqttController.is3DFeedback()):
                 handle_bluetooth_feedback()
 
-            time.sleep(0.01)
+            time.sleep(0.2)
 
         except KeyboardInterrupt:
                 print "Ctrl-c received! Sending kill to threads..."
