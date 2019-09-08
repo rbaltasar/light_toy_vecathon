@@ -3,10 +3,9 @@ import paho.mqtt.client as paho
 import json
 from datetime import datetime
 
-#--------------------------------------------#
-#Class to handle MQTT communication between
-#the master and the User
-#--------------------------------------------#
+BROKER_IP = "192.168.0.94"
+BROKER_PORT = 1883
+
 class MQTTController:
 
     def __init__(self):
@@ -98,8 +97,9 @@ class MQTTController:
 
         print("Starting MQTT client")
 
-        #Todo: IP address and port in config
-        self._client.connect("192.168.0.94",1883)
+        global BROKER_IP, BROKER_PORT
+
+        self._client.connect(BROKER_IP, BROKER_PORT)
         #Start client thread
         self._client.loop_start()
 

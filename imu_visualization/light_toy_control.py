@@ -91,8 +91,6 @@ if __name__== "__main__":
 
         except KeyboardInterrupt:
                 print "Ctrl-c received! Sending kill to threads..."
-                # Display al lamps as OFFLINE in the Dashboard
-                mqtt_controller.publish_alive_rx_status(0)
                 #Stop MQTT controller
                 mqtt_controller.stop()
                 #Stop UDP controller
