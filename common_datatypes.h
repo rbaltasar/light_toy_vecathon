@@ -94,15 +94,15 @@ struct RGBcolor
 typedef struct IMUData
 {
   /* Position from 0 - 360 */
-  int8_t xPos; /* roll */
-  int8_t yPos; /* pitch*/
-  int8_t zPos; /* jaw */
-  int8_t xSpeed;
-  int8_t ySpeed;
-  int8_t zSpeed;
-  int8_t xAcc;
-  int8_t yAcc;
-  int8_t zAcc; 
+  uint16_t xPos; /* roll */
+  uint16_t yPos; /* pitch*/
+  uint16_t zPos; /* jaw */
+  uint16_t xSpeed;
+  uint16_t ySpeed;
+  uint16_t zSpeed;
+  uint16_t xAcc;
+  uint16_t yAcc;
+  uint16_t zAcc; 
   // TODO : do we need for every access
 }IMUData;
 

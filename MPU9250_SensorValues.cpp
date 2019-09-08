@@ -13,18 +13,20 @@ MPU9250_SensorValues::MPU9250_SensorValues()
 MPU9250_SensorValues::~MPU9250_SensorValues()
 {}
 
-void MPU9250_SensorValues::ReadMpuSensorValue(MPU_Struct& mpuStruct)
+void MPU9250_SensorValues::ReadMpuSensorValue(stick_status* stick_status_request)
 {
 
   update();
-  
-  mpuStruct.mPos_x = pos_x;
-  mpuStruct.mPos_y = pos_y;
-  mpuStruct.mPos_z = pos_z;
 
-  mpuStruct.mAcc_x = acc_x;
-  mpuStruct.mAcc_y = acc_y;
-  mpuStruct.mAcc_z = acc_z;
+  
+  
+  stick_status_request->imuData.xPos = pos_x;
+  stick_status_request->imuData.yPos = pos_y;
+  stick_status_request->imuData.zPos = pos_z;
+
+  stick_status_request->imuData.xAcc = acc_x;
+  stick_status_request->imuData.yAcc = acc_y;
+  stick_status_request->imuData.zAcc = acc_z;
 }
 
 void MPU9250_SensorValues::begin()

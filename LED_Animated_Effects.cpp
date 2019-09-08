@@ -29,7 +29,9 @@ void LEDAnimatedEffects::FadeInOut(byte red, byte green, byte blue, IMUData imuD
 
   int k,order;
   uint16_t postitonS = imuData.xPos;
-
+  Serial.print("PostitonS: ");
+  Serial.println(postitonS);
+   
   if(start_sequence)
   {
     k = 0;
@@ -41,6 +43,7 @@ void LEDAnimatedEffects::FadeInOut(byte red, byte green, byte blue, IMUData imuD
     k = m_effect_state[0];
     order = m_effect_state[1];
   }
+  
   float r, g, b, relativePostion;
   /* Exponencial change */
   relativePostion = (pow(postitonS, 2))/8; //*(postitonS / 1.42);
@@ -51,6 +54,13 @@ void LEDAnimatedEffects::FadeInOut(byte red, byte green, byte blue, IMUData imuD
   g = int((float)((k/256.0))*green);
   b = int((float)((k/256.0))*blue);
 
+  Serial.print("r ");
+  Serial.println(r);
+  Serial.print("g ");
+  Serial.println(g);
+  Serial.print("b ");
+  Serial.println(b);
+  
   setAll(r,g,b);
   showStrip();
 
@@ -66,13 +76,8 @@ void LEDAnimatedEffects::RainbowFadeInOut(IMUData imuData)
 {
   int s,p, rIntensity, gIntensity, bIntensity, rSaturation, gSaturation, bSaturation, rPixel, gPixel, bPixel;
   uint16_t postitonS = imuData.xPos;
-  uint16_t speedS = imuData.xSpeed;
-  byte *c, *cs;
-
-  Serial.print("M Position of Stick: ");
-  Serial.println(imuData.xPos);
-  Serial.print("M Speed of Stick: ");
-  Serial.println(imuData.xSpeed);     
+  uint16_t accX = imuData.xAcc;
+  byte *c, *cs; 
   
   if(start_sequence)
   {
@@ -89,7 +94,7 @@ void LEDAnimatedEffects::RainbowFadeInOut(IMUData imuData)
   float r, g, b, relativePostion;
   
   relativePostion = postitonS / 1.42;
-  s = speedS;
+  s = accX;
  
   if(p < 256*5)
   {
@@ -114,14 +119,9 @@ void LEDAnimatedEffects::RainbowFadeInOut(IMUData imuData)
 void LEDAnimatedEffects::ColorChangingWithPosition(IMUData imuData)
 {
   int s,p, rIntensity, gIntensity, bIntensity, rSaturation, gSaturation, bSaturation, rPixel, gPixel, bPixel;
-  uint16_t postitonS = imuData.xPos;
-  uint16_t speedS = imuData.xSpeed;
-  byte *c, *cs;
-
-  Serial.print("M Position of Stick: ");
-  Serial.println(imuData.xPos);
-  Serial.print("M Speed of Stick: ");
-  Serial.println(imuData.xSpeed);     
+  uint16_t postitonS = imuData.yPos + imuData.xPos;
+  uint16_t zAcc = imuData.zAcc;
+  byte *c, *cs; 
   
   if(start_sequence)
   {
@@ -138,7 +138,7 @@ void LEDAnimatedEffects::ColorChangingWithPosition(IMUData imuData)
   float r, g, b, relativePostion;
   
   relativePostion = postitonS / 1.42;
-  s = speedS;
+  s = zAcc;
  
   if(p < 256*5)
   {
@@ -175,12 +175,12 @@ void LEDAnimatedEffects::TwinkleAnim(byte red, byte green, byte blue, int Count,
     i = m_effect_state[0];
   }
 
-  if ( ((now - m_last_iteration) > imuData.xSpeed))
+  if ( ((now - m_last_iteration) > imuData.yAcc))
   {
     m_last_iteration = now;
     setAll(0,0,0);
 
-    if(i < Count)
+    if(i < imuData.xPos)
     {
       setPixel(random(NUM_LEDS),red,green,blue);
       showStrip();
@@ -211,12 +211,12 @@ void LEDAnimatedEffects::TwinkleRandomAnim(int Count, IMUData imuData)
     i = m_effect_state[0];
   }
 
-  if ( ((now - m_last_iteration) > imuData.xSpeed))
+  if ( ((now - m_last_iteration) > imuData.xAcc))
   {
     m_last_iteration = now;
     setAll(0,0,0);
 
-    if(i < Count)
+    if(i < imuData.zPos)
     {
       setPixel(random(NUM_LEDS),random(0,255),random(0,255),random(0,255));
       showStrip();
@@ -237,7 +237,7 @@ void LEDAnimatedEffects::FireAnim(IMUData imuData)
 
   unsigned long now = millis();
 
-  if((now - m_last_iteration) > imuData.ySpeed)
+  if((now - m_last_iteration) > imuData.yAcc)
   {
 
     m_last_iteration = now;
@@ -245,7 +245,7 @@ void LEDAnimatedEffects::FireAnim(IMUData imuData)
 
     // Step 1.  Cool down every cell a little
     for( int i = 0; i < NUM_LEDS; i++) {
-      cooldown = random(0, ((imuData.zPos * 10) / NUM_LEDS) + 2);
+      cooldown = random(0, ((imuData.xPos * 10) / NUM_LEDS) + 2);
 
       if(cooldown>heat[i]) {
         heat[i]=0;

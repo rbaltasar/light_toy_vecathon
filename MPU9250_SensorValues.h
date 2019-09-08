@@ -8,6 +8,7 @@
 #endif
 
 #include "MPU9250.h"
+#include "common_datatypes.h"
 
 typedef struct MPU9250_Struct
 {
@@ -33,7 +34,7 @@ public:
 
   void begin();
   void stop();
-  void ReadMpuSensorValue(MPU_Struct& mpuStruct);
+  void ReadMpuSensorValue(stick_status* stick_status_request);
 
 };
 

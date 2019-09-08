@@ -25,8 +25,6 @@ private:
 
   stick_status* m_stick_status_request;
 
-  MPU_Struct m_mpuStruct;
-
   bool m_received_msg;
   
 public: 
@@ -37,7 +35,7 @@ public:
   void begin();
   void stop();
   void configure(){}; //Nothing to do but overload needed
-  void network_loop(MPU_Struct mpuStruct);
+  //void network_loop();
 
  
 };

@@ -204,8 +204,7 @@ void status_update()
 void loop()
 {
   /* Execute the network loop of the currently used communication handler */
-  mpu9250_sensorVal.ReadMpuSensorValue(mpuStruct);
-  udpHandlerObj.network_loop(mpuStruct);
+  mpu9250_sensorVal.ReadMpuSensorValue(&stick_state.val);
   
   /* Check for status updates */
   status_update();

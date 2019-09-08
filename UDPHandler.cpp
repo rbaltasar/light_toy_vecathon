@@ -107,10 +107,10 @@ void UDPHandler::begin()
               break;
               case GYROSCOPE:
               {
-                Serial.println("Gyroscope request");
+   
                 char buffer[50]=" ";
                 char* formato="{\"x\": %i, \"y\": %i, \"z\": %i}";
-                sprintf(buffer, formato, m_mpuStruct.mPos_x,m_mpuStruct.mPos_y,m_mpuStruct.mPos_z);
+                sprintf(buffer, formato, m_stick_status_request->imuData.xPos,m_stick_status_request->imuData.yPos,m_stick_status_request->imuData.zPos);
               
                 //Answer
                 packet.printf(buffer);
@@ -132,12 +132,6 @@ void UDPHandler::stop()
 {
   Serial.println("Stopping UDP communication handler");
   m_UDP.close();
-}
-
-
-void UDPHandler::network_loop(MPU_Struct mpuStruct)
-{
-  m_mpuStruct = mpuStruct;
 }
 
 /*********************************************************************************************************
