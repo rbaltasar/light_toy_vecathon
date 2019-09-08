@@ -7,6 +7,7 @@
  #include <WProgram.h>
 #endif
 
+#include "MPU9250_SensorValues.h"
 #include "AsyncUDP.h"
 
 
@@ -21,12 +22,10 @@ private:
   uint8_t m_message[100];
   IPAddress m_master_ip;
 
-  uint16_t m_x, m_y, m_z;
+  MPU_Struct m_mpuStruct;
 
   bool m_received_msg;
-
-  void process_message();
-
+  
 public: 
 
   UDPHandler();
@@ -35,7 +34,7 @@ public:
   void begin();
   void stop();
   void configure(){}; //Nothing to do but overload needed
-  void network_loop();
+  void network_loop(MPU_Struct mpuStruct);
 
  
 };

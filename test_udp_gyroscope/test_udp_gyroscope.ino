@@ -15,11 +15,7 @@
 UDPHandler udp_handler;
 MPU9250_SensorValues mpu9250_sensorVal;
 
-typedef struct MPU9250_Struct
-{
-uint16_t mPos_x,mPos_y,mPos_z;
-uint16_t mAcc_x,mAcc_y,mAcc_z;
-}MPU_Struct;
+MPU9250_Struct mpuStruct;
 
 void setup()
 {
@@ -32,9 +28,7 @@ void setup()
 
   /* Start with MQTT communication. Create object */  
   udp_handler.configure();
-  MPU9250_Struct mpuStruct;
   mpu9250_sensorVal.begin();
-  mpu9250_sensorVal.ReadMpuSensorValue(mpuStruct);
   udp_handler.begin();
 }
 
@@ -79,5 +73,6 @@ void setup_wifi()
 /* Main loop */
 void loop()
 {
-  udp_handler.network_loop();
+  mpu9250_sensorVal.ReadMpuSensorValue(mpuStruct);
+  udp_handler.network_loop(mpuStruct);
 }

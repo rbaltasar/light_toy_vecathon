@@ -13,8 +13,11 @@ MPU9250_SensorValues::MPU9250_SensorValues()
 MPU9250_SensorValues::~MPU9250_SensorValues()
 {}
 
-void MPU9250_SensorValues::ReadMpuSensorValue(MPU_Struct mpuStruct);
+void MPU9250_SensorValues::ReadMpuSensorValue(MPU_Struct& mpuStruct)
 {
+
+  update();
+  
   mpuStruct.mPos_x = pos_x;
   mpuStruct.mPos_y = pos_y;
   mpuStruct.mPos_z = pos_z;
@@ -27,39 +30,33 @@ void MPU9250_SensorValues::ReadMpuSensorValue(MPU_Struct mpuStruct);
 void MPU9250_SensorValues::begin()
 {
   Serial.println("Starting MPU communication handler");
-    Serial.begin(115200);
+  Serial.begin(115200);
 
-    Wire.begin();
+  Wire.begin();
 
-    delay(200);
-    mpu.setup();
+  delay(200);
+  mpu.setup();
 }
 
-void MPU9250_SensorValues::loop()
+void MPU9250_SensorValues::update()
 {
-    static uint32_t prev_ms = millis();
-    if ((millis() - prev_ms) > 16)
-    {
-        mpu.update();
-        pos_x = abs(mpu.getRoll());
-        pos_y = abs(mpu.getPitch());
-        pos_z = abs(mpu.getYaw());
 
-        acc_x = abs(mpu.getAcc(0));
-        acc_y = abs(mpu.getAcc(1));
-        acc_z = abs(mpu.getAcc(2));
-        
-        delay(20);
-        prev_ms = millis();
-    }
+  mpu.update();
+  pos_x = abs(mpu.getRoll());
+  pos_y = abs(mpu.getPitch());
+  pos_z = abs(mpu.getYaw());
+
+  acc_x = abs(mpu.getAcc(0));
+  acc_y = abs(mpu.getAcc(1));
+  acc_z = abs(mpu.getAcc(2));
+   
 }
 
 
 
 void MPU9250_SensorValues::stop()
 {
-  Serial.println("Stopping MPU communication handler");
-  m_UDP.close();
+
 }
 
 
