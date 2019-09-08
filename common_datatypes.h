@@ -19,13 +19,6 @@ enum system_state_var
   NORMAL = 1 // Normal mode
 };
 
-/* Communication type */
-enum COMM_TYPE
-{
-  MQTT = 0,
-  UDP = 1
-};
-
 /* Music effects */
 enum MusicMode
 {
@@ -64,6 +57,7 @@ enum AnimatedMode
   TWINKLE_WITH_SPEED =205,
   TWINKLE_RANDOM_WITH_SPEED = 206,
   FIRE_ANIM = 207,
+  CAMP_MONITOR = 208,
   
   //BLOOD_SWORD_YAW = 205,
   /* Influence the Bluetooth Image*/
@@ -100,9 +94,9 @@ typedef struct IMUData
   uint16_t xSpeed;
   uint16_t ySpeed;
   uint16_t zSpeed;
-  uint16_t xAcc;
-  uint16_t yAcc;
-  uint16_t zAcc; 
+  float xAcc;
+  float yAcc;
+  float zAcc; 
   // TODO : do we need for every access
 }IMUData;
 

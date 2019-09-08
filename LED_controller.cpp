@@ -170,6 +170,9 @@ void LEDController::feed()
       case FIRE_ANIM:
        m_animated_effects->FireAnim(m_stick_status_request->imuData);
         break;
+      case CAMP_MONITOR:
+       m_animated_effects->CampMonitor(m_stick_status_request->color.R, m_stick_status_request->color.G, m_stick_status_request->color.B, m_stick_status_request->imuData);
+        break;
     }
   }  
 }

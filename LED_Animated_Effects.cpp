@@ -24,7 +24,7 @@ void LEDAnimatedEffects::end_effect()
  *  Depending on the position the choosen RGB color will fade in or out: 
  *  The greater the position, the brighter it gets.
  */
-void LEDAnimatedEffects::FadeInOut(byte red, byte green, byte blue, IMUData imuData)
+void LEDAnimatedEffects::FadeInOut(byte red, byte green, byte blue, IMUData& imuData)
 {
 
   int k,order;
@@ -72,7 +72,7 @@ void LEDAnimatedEffects::FadeInOut(byte red, byte green, byte blue, IMUData imuD
  * The colors of the rainbow will be displayed acording to the position
  * The brightness of the color depends on the speed of the stick.
  */
-void LEDAnimatedEffects::RainbowFadeInOut(IMUData imuData)
+void LEDAnimatedEffects::RainbowFadeInOut(IMUData& imuData)
 {
   int s,p, rIntensity, gIntensity, bIntensity, rSaturation, gSaturation, bSaturation, rPixel, gPixel, bPixel;
   uint16_t postitonS = imuData.xPos;
@@ -116,51 +116,135 @@ void LEDAnimatedEffects::RainbowFadeInOut(IMUData imuData)
   m_effect_state[1] = s;
 }
 
-void LEDAnimatedEffects::ColorChangingWithPosition(IMUData imuData)
+void LEDAnimatedEffects::ColorChangingWithPosition(IMUData& imuData)
 {
-  int s,p, rIntensity, gIntensity, bIntensity, rSaturation, gSaturation, bSaturation, rPixel, gPixel, bPixel;
-  uint16_t postitonS = imuData.yPos + imuData.xPos;
-  uint16_t zAcc = imuData.zAcc;
-  byte *c, *cs; 
+  uint8_t red = (imuData.xPos <= 255) ? (uint8_t)imuData.xPos : 255;
+  uint8_t green = (imuData.yPos <= 255) ? (uint8_t)imuData.yPos : 255;
+  uint8_t blue = (imuData.zPos <= 255) ? (uint8_t)imuData.zPos : 255;
+
+  setAll(red , green , blue);   
+  showStrip();
+}
+
+/* Set a defined number of LEDs with the same color, with or without erasing the non-set leds */
+void LEDAnimatedEffects::setLeds(RGBcolor color, unsigned long delay_ms, uint8_t num_leds, bool erase_others)
+{
+  /* Clip value */
+  color.R > 255 ? color.R = 255 : color.R = color.R;
+  color.G > 255 ? color.G = 255 : color.G = color.G;
+  color.B > 255 ? color.B = 255 : color.B = color.B;
+  /* Set requested leds */
+  for(uint8_t i = 0; i < num_leds; i++ )
+  {
+    leds[i] = CRGB(color.R, color.G, color.B);
+    FastLED.show();
+    delay(delay_ms); 
+  }
+  /* Eras non-requested led */
+  if(erase_others)
+  {
+    for(uint8_t i = num_leds; i < NUM_LEDS; i++ )
+    {
+      leds[i] = CRGB(0, 0, 0);
+    }
+    FastLED.show();
+  }
+}
+
+void LEDAnimatedEffects::CampMonitor(byte red, byte green, byte blue, IMUData& imuData)
+{
+
+  Serial.println("Looping Camp Monitor");
+
+  float last_acc_y;
+  float last_acc_x;
+  uint8_t num_leds;
+  uint8_t divider;
   
   if(start_sequence)
   {
-    p = 0;
-    s = 0;
     start_sequence = false;
+    num_leds = 0;
+    divider = 10;
+    last_acc_x = 0;
+    last_acc_y = 0;
   }
   else
   {
-    p = m_effect_state[0];
-    s = m_effect_state[1];
+    num_leds = m_effect_state[0];
+    divider = m_effect_state[1];
+    last_acc_y = m_effect_state_float[0];
+    last_acc_x = m_effect_state_float[1];
   }
-  
-  float r, g, b, relativePostion;
-  
-  relativePostion = postitonS / 1.42;
-  s = zAcc;
- 
-  if(p < 256*5)
-  {
-    p =+ relativePostion;
 
-    c = Wheel((( 256 / NUM_LEDS) + p) & 255);
-    cs = compute_saturation(*c, *(c+1), *(c+2), s );    
-    setAll(*cs , *(cs+1) , *(cs+2));   
-    showStrip();
+  /* Get current IMU data */
+  float acc_x = imuData.xAcc;
+  float acc_y = imuData.yAcc;
+
+  Serial.print("Acc x: ");
+  Serial.println(acc_x);
+  Serial.print("Acc y ");
+  Serial.println(acc_y);
+
+  /* Check the highest contribution */
+  if(abs(acc_x) > abs(acc_y))
+  {
+    /* Biggest contribution in X --> fade color */
+    if( abs(acc_x - last_acc_x) > (acc_x * 0.1) )
+    {
+      /* Reduce divider */
+      if(divider > 2) divider-= 2;
+      else divider = 1;
+    }
+    else
+    {
+      /* Increment divider */
+      if(divider < 20) divider+= 2;
+      else divider = 20;
+    }
   }
   else
   {
-    p = 0;
+    /* Biggest contribution in Y --> change led amount */
+    /* Biggest contribution in X --> fade color */
+    if( abs(acc_y - last_acc_y) > abs(acc_y * 0.1) )
+    {
+      /* Reduce divider */
+      if(num_leds < (NUM_LEDS-2)) num_leds+=2;
+      else num_leds = NUM_LEDS - 1;
+    }
+    else
+    {
+      /* Increment divider */
+      if(num_leds > 2) num_leds-=2;
+      else num_leds = 0;
+    }
   }
+
+  RGBcolor mycolor;
+  mycolor.R = red/divider;
+  mycolor.G = green/divider;
+  mycolor.B = blue/divider;
+
+  Serial.print("Num leds: ");
+  Serial.println(num_leds);
+  Serial.print("Color ");
+  Serial.print(mycolor.R);
+  Serial.print(" / ");
+  Serial.print(mycolor.G);
+  Serial.print(" / ");
+  Serial.println(mycolor.B);
   
-  m_effect_state[0] = p;
-  m_effect_state[1] = s;
+  setLeds(mycolor,0,num_leds,true);
+
+  m_effect_state_float[0] = acc_y;
+  m_effect_state_float[1] = acc_x;
+  m_effect_state[0] = num_leds;
+  m_effect_state[1] = divider;
+
 }
 
-
-
-void LEDAnimatedEffects::TwinkleAnim(byte red, byte green, byte blue, int Count, IMUData imuData)
+void LEDAnimatedEffects::TwinkleAnim(byte red, byte green, byte blue, int Count, IMUData& imuData)
 {
 
   unsigned long now = millis();
@@ -196,8 +280,7 @@ void LEDAnimatedEffects::TwinkleAnim(byte red, byte green, byte blue, int Count,
 
 }
 
-
-void LEDAnimatedEffects::TwinkleRandomAnim(int Count, IMUData imuData)
+void LEDAnimatedEffects::TwinkleRandomAnim(int Count, IMUData& imuData)
 {
   unsigned long now = millis();
   int i;
@@ -230,7 +313,7 @@ void LEDAnimatedEffects::TwinkleRandomAnim(int Count, IMUData imuData)
   m_effect_state[0] = i;
 }
 
-void LEDAnimatedEffects::FireAnim(IMUData imuData)
+void LEDAnimatedEffects::FireAnim(IMUData& imuData)
 {
 
   static byte heat[NUM_LEDS];
@@ -334,7 +417,7 @@ void LEDAnimatedEffects::SnowSparkle(byte red, byte green, byte blue, int Sparkl
 }
 
 
-void LEDAnimatedEffects::rainbowCycle(int SpeedDelay, IMUData imuData)
+void LEDAnimatedEffects::rainbowCycle(int SpeedDelay, IMUData& imuData)
 {
   unsigned long now = millis();
   byte *c;
@@ -405,7 +488,7 @@ byte * LEDAnimatedEffects::Wheel(byte WheelPos)
 
 
 // used by meteorrain
-void LEDAnimatedEffects::fadeToBlack(int ledNo, byte fadeValue, IMUData imuData) {
+void LEDAnimatedEffects::fadeToBlack(int ledNo, byte fadeValue, IMUData& imuData) {
  #ifdef ADAFRUIT_NEOPIXEL_H
     // NeoPixel
     uint32_t oldColor;

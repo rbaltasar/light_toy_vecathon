@@ -48,10 +48,11 @@ void MPU9250_SensorValues::update()
   pos_y = abs(mpu.getPitch());
   pos_z = abs(mpu.getYaw());
 
-  acc_x = abs(mpu.getAcc(0));
-  acc_y = abs(mpu.getAcc(1));
-  acc_z = abs(mpu.getAcc(2));
-   
+  acc_x = mpu.getAcc(0) * 1000;
+  acc_y = mpu.getAcc(1) * 1000;
+  acc_z = mpu.getAcc(2) * 1000;
+
+  mpu.printRawData();
 }
 
 

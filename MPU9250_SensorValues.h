@@ -22,7 +22,7 @@ class MPU9250_SensorValues
 private:
   MPU9250 mpu;
   uint16_t pos_x, pos_y, pos_z;
-  uint16_t acc_x, acc_y, acc_z;
+  float acc_x, acc_y, acc_z;
 
   void setup();
   void update();
