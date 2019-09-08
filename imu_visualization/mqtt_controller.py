@@ -12,7 +12,7 @@ class MQTTController:
     def __init__(self):
 
         #Create client
-        self._client = paho.Client("LampNetworkMaster")
+        self._client = paho.Client("LightToyController")
         #Define callback for received topics
         self._client.on_message =  self.callback
 
@@ -23,6 +23,8 @@ class MQTTController:
         self._brightness = 0
 
         self._gyroscope = [0,0,0]
+
+        self._is3DFeedback = False
 
     def __del__(self):
 
@@ -41,13 +43,22 @@ class MQTTController:
 
             print("Received a power message")
 
+        #Handle configuration message
+        elif(message.topic == "light_toy/enable_visualization"):
+
+            print("Received a visualization enable message")
+
+            if( int(received_msg == 1) ):
+                self._is3DFeedback = True
+            else:
+                self._is3DFeedback = False
 
         #Handle mode request message
         elif(message.topic == "light_toy/mode"):
 
             print("Received a mode request message")
 
-            self._mode = int(received_msg['mode'])
+            self._mode = int(received_msg)
 
         #Handle mode request message
         elif(message.topic == "light_toy/color"):
@@ -62,7 +73,7 @@ class MQTTController:
 
             print("Received a brightness request message")
 
-            self._brightness = int(received_msg['brightness'])
+            self._brightness = int(received_msg)
 
         elif(message.topic == "light_toy/gyroscope/x"):
 
@@ -88,12 +99,13 @@ class MQTTController:
         print("Starting MQTT client")
 
         #Todo: IP address and port in config
-        self._client.connect("127.0.0.1",1883)
+        self._client.connect("192.168.0.94",1883)
         #Start client thread
         self._client.loop_start()
 
         #Subscribe to topics
         self._client.subscribe("light_toy/brightness")
+        self._client.subscribe("light_toy/enable_visualization")
         self._client.subscribe("light_toy/gyroscope/x")
         self._client.subscribe("light_toy/gyroscope/y")
         self._client.subscribe("light_toy/gyroscope/z")
@@ -108,10 +120,9 @@ class MQTTController:
         self._client.disconnect() #disconnect
         self._client.loop_stop() #stop loop thread
 
-    def publish_alive_rx_status(self, status):
+    def is3DFeedback(self):
 
-        print("Publishing Alive status of slaves (mask): ", status)
-        self._client.publish("lamp_network_music/alive_rx_mask", str(status))
+        return self._is3DFeedback
 
     #Check for new mode change message and reset the flag
     def is_new_msg_mode(self):

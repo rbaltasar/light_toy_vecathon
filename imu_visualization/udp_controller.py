@@ -90,7 +90,6 @@ class UDPController:
 
         return [0,0,0]
 
-
     #Send synchroniztion request
     def send_mode_req(self, mode):
 
@@ -103,10 +102,35 @@ class UDPController:
 
         self.send_message(m)
 
+    #Send synchroniztion request
+    def send_power_req(self, mode):
+
+        print("Sending power request")
+
+        msgId = 0x01 #Todo: define message IDs in a different file
+
+        m = ''
+        m += chr(msgId) + chr(mode)
+
+        self.send_message(m)
+
+    def send_brightness_req(self, brightness):
+
+        print("Sending brightness request")
+
+        msgId = 0x03 #Todo: define message IDs in a different file
+
+        m = ''
+        m += chr(msgId) + chr(brightness)
+
+        self.send_message(m)
+
     #send mode change request
     def send_color_req(self, color):
 
         print("Sending color request")
+
+        msgId = 0x02
 
         m = ''
         m += chr(msgId) + chr(color[0]) + chr(color[1]) + chr(color[2])

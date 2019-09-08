@@ -12,6 +12,11 @@ udpController = udp_controller.UDPController()
 visualizer = visualization_controller.VisualizatonController()
 gyroscope_info_global = [0,0,0]
 
+stick_on = False
+stick_mode = 0
+stick_color = [0,0,0]
+stick_brightness = 0
+
 def handle_bluetooth_feedback():
 
     #Get the gyroscope information from the bluetooth controller
@@ -28,6 +33,40 @@ def handle_bluetooth_feedback():
         #Send the information to the visualization
         visualizer.send_3D_info(gyroscope_info[0],gyroscope_info[1],gyroscope_info[2])
 
+
+def handle_mqtt_communication():
+
+    global stick_on, stick_mode, stick_color, stick_brightness
+
+    #Get current info from MQTT controller
+    stick_on_tmp = mqttController.get_power()
+    stick_mode_tmp = mqttController.get_mode()
+    stick_color_tmp = mqttController.get_color()
+    stick_brightness_tmp = mqttController.get_brightness()
+
+    if(stick_on_tmp != stick_on):
+        stick_on = stick_on_tmp
+
+    if(stick_mode_tmp != stick_mode):
+        stick_mode = stick_mode_tmp
+        udpController.send_mode_req(stick_mode)
+
+    if(stick_brightness != stick_brightness_tmp):
+        stick_brightness = stick_brightness_tmp
+        udpController.send_brightness_req(stick_brightness)
+
+    if(stick_color_tmp[0] != stick_color[0] or stick_color_tmp[1] != stick_color[1] or stick_color_tmp[2] != stick_color[2]):
+        stick_color[0] = stick_color_tmp[0]
+        stick_color[1] = stick_color_tmp[1]
+        stick_color[2] = stick_color_tmp[2]
+
+        udpController.send_color_req(stick_color)
+
+    if(stick_mode_tmp != stick_mode):
+        stick_mode = stick_mode_tmp
+        udpController.send_mode_req(stick_mode)
+
+
 if __name__== "__main__":
 
     #Start MQTT communication
@@ -41,12 +80,12 @@ if __name__== "__main__":
 
         try:
 
-            #Get new MQTT commands
+            #Handle MQTT communication
+            handle_mqtt_communication()
 
-            #Send bluetooth commands
-
-            #Handle received bluetooth information
-            handle_bluetooth_feedback()
+            #Handle 3D visualization
+            if(mqttController.is3DFeedback()):
+                handle_bluetooth_feedback()
 
             time.sleep(0.01)
 
