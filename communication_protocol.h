@@ -21,7 +21,7 @@ enum BT_Message_Id
 struct bt_mode_msg
 {
   uint8_t msgID;
-  uint8_t mode;
+  uint8_t Mode;
 };
 
 /* BT color message */
@@ -59,7 +59,19 @@ struct bt_image_msg
 struct bt_gyroscope_msg
 {
   uint8_t msgID;
-  
+  uint8_t x;
+  uint8_t y;
+  uint8_t z;
+}
+
+/* */
+struct MyReceivedData
+{
+  bt_mode_msg* ptrMode = null;
+  bt_color_msg* ptrColor = null;
+  bt_intensity_msg* ptrIntensity = null;
+  bt_config_msg* ptrConfig = null;
+  bt_image_msg* ptrImage = null;
 }
 
 
