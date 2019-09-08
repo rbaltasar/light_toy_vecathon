@@ -1,7 +1,9 @@
 
 #include <rom/rtc.h>
+#include <WiFi.h>
 #include "LED_controller.h"
 #include "UDPHandler.h"
+#include "network_credentials.h"
 
 //Include library for MPU
 //Include library for Gesture Recognition Sensor
@@ -18,16 +20,12 @@ state_tracker<stick_status> stick_state;
 LEDController LED_controller(&stick_state.val);
 
 /* MPU object */
-
+MPU9250_SensorValues mpu9250_sensorVal;
+MPU9250_Struct mpuStruct;
 /* Gesture recognition object */
 
 /* Communication controller */
-UDPHandler udpHandlerObj;
-
-/* Global variable */
-MyReceivedData* ptrMyReceivedData; 
-
-
+UDPHandler udpHandlerObj(&stick_state.val);
 
 unsigned long m_last_time_test = 0;
 int directionPosition = 0;  // for debugging
@@ -36,6 +34,10 @@ void setup()
 {
   
   Serial.begin(115200);
+
+  /* Setup the WiFi connection */
+  setup_wifi();
+  delay(10);
 
   /* Setup the hardware */
   setup_hardware(); 
@@ -79,9 +81,45 @@ void setup()
   /* Init state */
 
   /* Setup finished. Show leds */
-  LED_controller.setLeds(stick_state.val.color,0,NUM_LEDS);
+  //LED_controller.setLeds(stick_state.val.color,0,NUM_LEDS);
 
   Serial.println("Finished setup");
+}
+
+/* Get the IP address in String format */
+String IpAddress2String(const IPAddress& ipAddress)
+{
+  return String(ipAddress[0]) + String(".") +\
+  String(ipAddress[1]) + String(".") +\
+  String(ipAddress[2]) + String(".") +\
+  String(ipAddress[3])  ;
+}
+
+/* Setup WiFi connection */
+void setup_wifi()
+{
+  WiFi.begin(ssid, password); // Connect to the network. Use network_credentials.h
+  Serial.print("Connecting to ");
+  Serial.print(ssid);
+  Serial.println(" ...");
+
+  //WiFi.mode(WIFI_STA);
+  
+  int i = 0;
+  while (WiFi.status() != WL_CONNECTED)
+  { // Wait for the Wi-Fi to connect
+    delay(1000);
+    Serial.print(++i);
+    Serial.print(' ');
+  }
+
+  Serial.println('\n');
+  Serial.println("Connection established!");
+  Serial.print("IP address:\t");
+  Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
+  Serial.print("MAC address: ");
+  Serial.println(WiFi.macAddress());
+
 }
 
 /* Setup the LED controller */
@@ -91,6 +129,7 @@ void setup_hardware()
   LED_controller.setup();
 
   //Setup MPU
+  mpu9250_sensorVal.begin();
 
   //Setup Gesture Recognition Sensor
 
@@ -99,9 +138,7 @@ void setup_hardware()
 /* Setup the communication */
 void setup_communication()
 {
-  //Setup the bluetooth controller
-
-  //Be discoverable. Accept connections?
+  udpHandlerObj.begin();
 }
 
 /* Update the current stick mode */
@@ -167,7 +204,8 @@ void status_update()
 void loop()
 {
   /* Execute the network loop of the currently used communication handler */
-  udpHandlerObj.begin();
+  mpu9250_sensorVal.ReadMpuSensorValue(mpuStruct);
+  udpHandlerObj.network_loop(mpuStruct);
   
   /* Check for status updates */
   status_update();
@@ -178,6 +216,7 @@ void loop()
   /* Feed the LED controller */
   LED_controller.feed();
 
+#if 0
   //Initial debug: change effect every second
   if( (millis() - m_last_time_test) > 10 )
   {
@@ -235,5 +274,5 @@ void loop()
     /* END OF SIMULATION OF MODE; SPPED;POSTION */
     m_last_time_test = millis();
   }
-
+#endif
 }

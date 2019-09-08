@@ -95,7 +95,7 @@ class UDPController:
 
         print("Sending mode request")
 
-        msgId = 0x01 #Todo: define message IDs in a different file
+        msgId = 0x00 #Todo: define message IDs in a different file
 
         m = ''
         m += chr(msgId) + chr(mode)
@@ -107,7 +107,7 @@ class UDPController:
 
         print("Sending power request")
 
-        msgId = 0x01 #Todo: define message IDs in a different file
+        msgId = 0x99 #Todo: define message IDs in a different file
 
         m = ''
         m += chr(msgId) + chr(mode)
@@ -118,7 +118,7 @@ class UDPController:
 
         print("Sending brightness request")
 
-        msgId = 0x03 #Todo: define message IDs in a different file
+        msgId = 0x02 #Todo: define message IDs in a different file
 
         m = ''
         m += chr(msgId) + chr(brightness)
@@ -130,7 +130,7 @@ class UDPController:
 
         print("Sending color request")
 
-        msgId = 0x02
+        msgId = 0x01
 
         m = ''
         m += chr(msgId) + chr(color[0]) + chr(color[1]) + chr(color[2])

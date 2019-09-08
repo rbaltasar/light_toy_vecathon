@@ -5,7 +5,8 @@
 
 
 
-UDPHandler::UDPHandler()
+UDPHandler::UDPHandler(stick_status* stick_status_request):
+m_stick_status_request(stick_status_request)
 {
   /*
   m_mpuStruct.mPos_x = 0;
@@ -74,47 +75,57 @@ void UDPHandler::begin()
             switch (msg_id)
             {
               case MODE_SELECT:
-                ComGet_ModeSelect(m_message);
+
+                Serial.print("Handled mode request message: ");
+                Serial.println(m_message[1]);
+                m_stick_status_request->stick_mode = m_message[1];
+                
               break;
               case COLOR:
-                ComGet_Color(m_message);
+
+                Serial.print("Handled color request message: ");
+                Serial.println(m_message[1]);
+                Serial.println(m_message[2]);
+                Serial.println(m_message[3]);
+                
+                m_stick_status_request->color.R = m_message[1];
+                m_stick_status_request->color.G = m_message[2];
+                m_stick_status_request->color.B = m_message[3];
               break;
               case INTENSITY:
-                ComGet_Intensity(m_message);
+
+                Serial.print("Handled brightness request message: ");
+                Serial.println(m_message[1]);
+                m_stick_status_request->brightness = m_message[1];
               break;
               case CONFIG:
-                ComGet_Config(m_message);
+                Serial.println("Config message. Nothing to do");
               break;
               case IMAGE:
-                ComGet_Image(m_message);
+                Serial.println("Image message. Nothing to do");
+         
               break;
+              case GYROSCOPE:
+              {
+                Serial.println("Gyroscope request");
+                char buffer[50]=" ";
+                char* formato="{\"x\": %i, \"y\": %i, \"z\": %i}";
+                sprintf(buffer, formato, m_mpuStruct.mPos_x,m_mpuStruct.mPos_y,m_mpuStruct.mPos_z);
+              
+                //Answer
+                packet.printf(buffer);
+              break;
+              }
               default:
               /* Do Nothing */
               break;
             }
-            if(msg_id != 0x05)
-            {
-              Serial.println("Received a normal message");
+        });
 
-              //Todo: here we must trigger in our system the change requested by the message
-            }
-
-            /* This is a IMU information request. Respond with the real data! */
-            else
-            {
-
-              char buffer[50]=" ";
-              char* formato="{\"x\": %i, \"y\": %i, \"z\": %i}";
-             // sprintf(buffer, formato, m_mpuStruct.mPos_x,m_mpuStruct.mPos_y,m_mpuStruct.mPos_z);
-              
-              Serial.println("Received request. Sending gyro info");
-              packet.printf(buffer);
-            }
-           
-            m_received_msg = false;
-
-        });       
+      
     }
+
+    Serial.println("UDP setup complete");
 }
 
 void UDPHandler::stop()
@@ -123,12 +134,12 @@ void UDPHandler::stop()
   m_UDP.close();
 }
 
-/*
+
 void UDPHandler::network_loop(MPU_Struct mpuStruct)
 {
   m_mpuStruct = mpuStruct;
 }
-*/
+
 /*********************************************************************************************************
   END FILE
 *********************************************************************************************************/
