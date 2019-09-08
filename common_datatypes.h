@@ -58,7 +58,7 @@ enum AnimatedMode
   TWINKLE_RANDOM_WITH_SPEED = 206,
   FIRE_ANIM = 207,
   CAMP_MONITOR = 208,
-  
+  STROBE_ANIM = 209,
   //BLOOD_SWORD_YAW = 205,
   /* Influence the Bluetooth Image*/
   FASTER_HOTTER = 250,

@@ -46,7 +46,7 @@ void setup()
   setup_communication();
 
   /* Initial configuration of the stick when the system is booted */
-  stick_state.val.stick_mode =  208; //10 + STROBE;
+  stick_state.val.stick_mode =  200; //10 + STROBE;
   stick_state.val.color.R = 0;
   stick_state.val.color.G = G_DEFAULT;
   stick_state.val.color.B = 0;
