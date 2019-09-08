@@ -60,7 +60,7 @@ void LEDAnimatedEffects::StrobeAnim(byte red, byte green, byte blue, IMUData& im
   int j,order;
   int16_t StrobeCount = imuData.yPos;
   float flashCalc = (float)((imuData.xAcc + imuData.yAcc + imuData.zAcc));
-  int16_t FlashDelay = int16_t (3000 - (float)flashCalc);
+  int16_t FlashDelay = int16_t (1000 - (float)flashCalc);
 
   Serial.print("FlashDelay ");
   Serial.println(FlashDelay);
@@ -122,9 +122,11 @@ void LEDAnimatedEffects::StrobeAnim(byte red, byte green, byte blue, IMUData& im
 void LEDAnimatedEffects::RainbowFadeInOut(IMUData& imuData)
 {
   int s,p, rIntensity, gIntensity, bIntensity, rSaturation, gSaturation, bSaturation, rPixel, gPixel, bPixel;
-  int16_t postitonS = imuData.xPos;
-  int16_t accX = imuData.xAcc;
+  int16_t postitonS = imuData.xPos + imuData.yPos;
+  //float velocity = (imuData.xVelocity + imuData.yVelocity )/2;
+  float acc = (imuData.xAcc + imuData.yAcc )/2;
   byte *c, *cs; 
+
   
   if(start_sequence)
   {
@@ -141,7 +143,7 @@ void LEDAnimatedEffects::RainbowFadeInOut(IMUData& imuData)
   float r, g, b, relativePostion;
   
   relativePostion = postitonS / 1.42;
-  s = accX;
+  s = acc;
  
   if(p < 256*5)
   {
@@ -470,7 +472,7 @@ void LEDAnimatedEffects::rainbowCycle(int SpeedDelay, IMUData& imuData)
   byte *c;
   int j;
   uint8_t pos = imuData.xPos;
-  uint8_t speed = imuData.xSpeed;
+  uint8_t speed = imuData.xVelocity;
 
   
   if(start_sequence)

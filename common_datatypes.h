@@ -91,9 +91,9 @@ typedef struct IMUData
   uint16_t xPos; /* roll */
   uint16_t yPos; /* pitch*/
   uint16_t zPos; /* jaw */
-  uint16_t xSpeed;
-  uint16_t ySpeed;
-  uint16_t zSpeed;
+  float xVelocity;
+  float yVelocity;
+  float zVelocity;
   float xAcc;
   float yAcc;
   float zAcc; 

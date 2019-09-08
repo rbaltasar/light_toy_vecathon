@@ -10,12 +10,6 @@
 #include "MPU9250.h"
 #include "common_datatypes.h"
 
-typedef struct MPU9250_Struct
-{
-uint16_t mPos_x,mPos_y,mPos_z;
-uint16_t mAcc_x,mAcc_y,mAcc_z;
-}MPU_Struct;
-
 class MPU9250_SensorValues
 {
 
@@ -23,7 +17,8 @@ private:
   MPU9250 mpu;
   uint16_t pos_x, pos_y, pos_z;
   float acc_x, acc_y, acc_z;
-
+  float vel_x, vel_y, vel_z;
+  uint32_t prev_ms;
   void setup();
   void update();
   
