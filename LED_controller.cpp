@@ -8,6 +8,8 @@ m_stick_status_request(stick_status_request)
   m_static_effects = new LEDStaticEffects(this, m_leds);
   /* Create music effects object */
   m_music_effects = new LEDMusicEffects(this, m_leds);
+  /* Create animated effects object */
+  m_animated_effects = new LEDAnimatedEffects(this, m_leds);
 }
 
 LEDController::~LEDController()
@@ -15,6 +17,7 @@ LEDController::~LEDController()
   /* Deallocate memory */
   delete m_static_effects;
   delete m_music_effects;
+  delete m_animated_effects;
 }
 
 /* Hardware setup */
@@ -126,7 +129,7 @@ void LEDController::feed()
     }
   }
   /* Music effects - Range >= 100 */
-  else if(m_mode >= 100)
+  else if(m_mode >= 100 && m_mode < 200 )
   {
      switch(m_mode - 100)
     {
@@ -141,6 +144,34 @@ void LEDController::feed()
         break;
     }
   }
+  /* Music effects - Range >= 100 */
+  else if(m_mode >= 200 || m_mode < 300 )
+  {
+     switch(m_mode)
+    {
+      case 200:
+         m_static_effects->rainbowCycle(m_stick_status_request->effect_speed);
+         break;
+      case FADE_IN_OUT_POSITION:
+        m_animated_effects->FadeInOut(m_stick_status_request->color.R, m_stick_status_request->color.G, m_stick_status_request->color.B, m_stick_status_request->imuData );
+        break;
+      case RAINBOW_FADE_POSITION_SPEED:       
+        m_animated_effects->RainbowFadeInOut(m_stick_status_request->imuData);
+        break;
+      case COLOR_CHANGE_WITH_POSITION:       
+        m_animated_effects->ColorChangingWithPosition(m_stick_status_request->imuData);
+        break;      
+      case TWINKLE_WITH_SPEED:
+        m_animated_effects->TwinkleAnim(m_stick_status_request->color.R, m_stick_status_request->color.G, m_stick_status_request->color.B, 16, m_stick_status_request->imuData);
+        break;
+      case TWINKLE_RANDOM_WITH_SPEED:
+        m_animated_effects->TwinkleRandomAnim(16, m_stick_status_request->imuData);
+        break;
+      case FIRE_ANIM:
+       m_animated_effects->FireAnim(m_stick_status_request->imuData);
+        break;
+    }
+  }  
 }
   
 /* Update the LED mode */

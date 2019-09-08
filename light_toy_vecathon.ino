@@ -1,6 +1,7 @@
 
 #include <rom/rtc.h>
 #include "LED_controller.h"
+#include "UDPHandler.h"
 
 //Include library for MPU
 //Include library for Gesture Recognition Sensor
@@ -20,10 +21,17 @@ LEDController LED_controller(&stick_state.val);
 
 /* Gesture recognition object */
 
-/* Bluetooth controller */
+/* Communication controller */
+UDPHandler udpHandlerObj;
+
+/* Global variable */
+MyReceivedData* ptrMyReceivedData; 
+
+
 
 unsigned long m_last_time_test = 0;
-
+int directionPosition = 0;  // for debugging
+  
 void setup()
 {
   
@@ -36,7 +44,7 @@ void setup()
   setup_communication();
 
   /* Initial configuration of the stick when the system is booted */
-  stick_state.val.stick_mode = 10 + STROBE;
+  stick_state.val.stick_mode =  200; //10 + STROBE;
   stick_state.val.color.R = 0;
   stick_state.val.color.G = G_DEFAULT;
   stick_state.val.color.B = 0;
@@ -45,6 +53,12 @@ void setup()
   stick_state.val.effect_speed = 50; 
   stick_state.val.effect_amount = 1;
   stick_state.val.sysState = STARTUP;
+  stick_state.val.imuData.xPos = 0;
+  stick_state.val.imuData.xSpeed = 0;
+  stick_state.val.imuData.yPos = 0;
+  stick_state.val.imuData.ySpeed = 0;
+  stick_state.val.imuData.zPos = 0;
+  stick_state.val.imuData.zSpeed = 0;
 
   /* Same configuration for the "old" variable. TODO: create copy operator */
   stick_state.old.stick_mode = 99;
@@ -55,6 +69,12 @@ void setup()
   stick_state.old.effect_delay = 50;
   stick_state.old.effect_speed = 50; 
   stick_state.old.effect_amount = 1;
+  stick_state.old.imuData.xPos = 0;
+  stick_state.old.imuData.xSpeed = 0;
+  stick_state.old.imuData.yPos = 0;
+  stick_state.old.imuData.ySpeed = 0;
+  stick_state.old.imuData.zPos = 0;
+  stick_state.old.imuData.zSpeed = 0;  
 
   /* Init state */
 
@@ -147,6 +167,7 @@ void status_update()
 void loop()
 {
   /* Execute the network loop of the currently used communication handler */
+  udpHandlerObj.begin();
   
   /* Check for status updates */
   status_update();
@@ -157,12 +178,61 @@ void loop()
   /* Feed the LED controller */
   LED_controller.feed();
 
-  //Initial debug: change effect every 30 seconds
-  if( (millis() - m_last_time_test) > 30000 )
+  //Initial debug: change effect every second
+  if( (millis() - m_last_time_test) > 10 )
   {
-    if(stick_state.val.stick_mode == (10 + BOUNCING_COLORED_BALLS)) stick_state.val.stick_mode = 10;
-    else stick_state.val.stick_mode++;
+
+    //////////////////////////////////////
+    /* SIMULATION OF MODE; SPPED;POSTION */
+    stick_state.val.stick_mode = ptrMyReceivedData->ptrMode->Mode;
+
+    /*
+    stick_state.val.imuData.xPos = 
+    stick_state.val.imuData.yPos = 
+    stick_state.val.imuData.zPos = 
+
+    stick_state.val.imuData.xSpeed =
+    stick_state.val.imuData.ySpeeds =
+    stick_state.val.imuData.zSpeedPos =
+    */
+    stick_state.val.color.R = ptrMyReceivedData->ptrColor->color.R;
+    stick_state.val.color.G = ptrMyReceivedData->ptrColor->color.G;
+    stick_state.val.color.B = ptrMyReceivedData->ptrColor->color.B;
+    stick_state.val.brightness = ptrMyReceivedData->ptrIntensity->intensity;
+  
+   // stick_state.val.imuData.xSpeed = 400;
+     
+    if((directionPosition == 0) && (stick_state.val.imuData.xPos < 360))
+    {
+      stick_state.val.imuData.xPos++;
+      stick_state.val.imuData.yPos++;
+      stick_state.val.imuData.zPos++;
+      stick_state.val.imuData.xSpeed++;
+      stick_state.val.imuData.ySpeed=+3;
+      stick_state.val.imuData.zSpeed=+2;
+      if(stick_state.val.imuData.xPos == 360)
+      {
+        directionPosition = 1;
+      }
+    }
+    else if( directionPosition == 1)
+    {
+      Serial.print("MIN Speed of Stick: ");
+      Serial.println(stick_state.val.imuData.xSpeed);
+      stick_state.val.imuData.xPos--;
+      stick_state.val.imuData.yPos--;
+      stick_state.val.imuData.zPos--;
+      stick_state.val.imuData.xSpeed--;
+      stick_state.val.imuData.ySpeed=-2;
+      stick_state.val.imuData.ySpeed=-3;
+      if(stick_state.val.imuData.xPos == 0)
+      {
+        directionPosition = 0;
+      }
+    }
     
+    //////////////////////////////////////
+    /* END OF SIMULATION OF MODE; SPPED;POSTION */
     m_last_time_test = millis();
   }
 

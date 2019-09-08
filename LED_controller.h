@@ -11,10 +11,12 @@
 #include <FastLED.h>
 #include "common_datatypes.h"
 #include "LED_Static_Effects.h"
+#include "LED_Animated_Effects.h"
 #include "LED_Music_Effects.h"
 
 class LEDStaticEffects;
 class LEDMusicEffects;
+class LEDAnimatedEffects;
 
 class LEDController
 {
@@ -27,6 +29,7 @@ private:
 
   LEDStaticEffects* m_static_effects;
   LEDMusicEffects* m_music_effects;
+  LEDAnimatedEffects* m_animated_effects;
 
 public: 
 

@@ -1,13 +1,17 @@
 #include "UDPHandler.h" 
 
-/* Global variable */
-MyReceivedData* ptrMyReceivedData = null; 
+#include <stdio.h>
+#include <stdlib.h>
+
+
 
 UDPHandler::UDPHandler()
 {
+  /*
   m_mpuStruct.mPos_x = 0;
   m_mpuStruct.mPos_y = 0;
   m_mpuStruct.mPos_z = 0;
+  */
 }
 
 UDPHandler::~UDPHandler()
@@ -24,9 +28,9 @@ void ComGet_ModeSelect(uint8_t* data)
 void ComGet_Color(uint8_t* data)
 {
   ptrMyReceivedData->ptrColor->msgID = data[0];
-  ptrMyReceivedData->ptrColor->color.red = data[1];
-  ptrMyReceivedData->ptrColor->color.blue = data[2];
-  ptrMyReceivedData->ptrColor->color.yellow = data[3];
+  ptrMyReceivedData->ptrColor->color.R = data[1];
+  ptrMyReceivedData->ptrColor->color.G = data[2];
+  ptrMyReceivedData->ptrColor->color.B = data[3];
 }
 
 void ComGet_Intensity(uint8_t* data)
@@ -46,7 +50,7 @@ void ComGet_Image(uint8_t* data)
 {
   ptrMyReceivedData->ptrImage->msgID = data[0];
   ptrMyReceivedData->ptrImage->msg_size = data[1];
-  ptrMyReceivedData->ptrImage->image_bytes = data[2];
+  ptrMyReceivedData->ptrImage->image_bytes = data+2;
 }
 
 
@@ -101,7 +105,7 @@ void UDPHandler::begin()
 
               char buffer[50]=" ";
               char* formato="{\"x\": %i, \"y\": %i, \"z\": %i}";
-              sprintf(buffer, formato, m_mpuStruct.mPos_x,m_mpuStruct.mPos_y,m_mpuStruct.mPos_z);
+             // sprintf(buffer, formato, m_mpuStruct.mPos_x,m_mpuStruct.mPos_y,m_mpuStruct.mPos_z);
               
               Serial.println("Received request. Sending gyro info");
               packet.printf(buffer);
@@ -119,12 +123,12 @@ void UDPHandler::stop()
   m_UDP.close();
 }
 
-
+/*
 void UDPHandler::network_loop(MPU_Struct mpuStruct)
 {
   m_mpuStruct = mpuStruct;
 }
-
+*/
 /*********************************************************************************************************
   END FILE
 *********************************************************************************************************/

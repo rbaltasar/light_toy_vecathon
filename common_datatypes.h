@@ -52,7 +52,25 @@ enum StaticMode
   BOUNCING_COLORED_BALLS = 12
 };
 
-
+/* Static effects */
+enum AnimatedMode
+{
+  /*Stand Alone */
+  ANGLE_RAINBOW_PITCH = 200,
+  ANGLE_RAINBOW_ROLL = 201,
+  FADE_IN_OUT_POSITION = 202,
+  RAINBOW_FADE_POSITION_SPEED = 203,
+  COLOR_CHANGE_WITH_POSITION = 204,
+  TWINKLE_WITH_SPEED =205,
+  TWINKLE_RANDOM_WITH_SPEED = 206,
+  FIRE_ANIM = 207,
+  
+  //BLOOD_SWORD_YAW = 205,
+  /* Influence the Bluetooth Image*/
+  FASTER_HOTTER = 250,
+  FASTER_BRIGHTTER = 251,
+  TWINKLE_IMAGE = 252
+};
 
 /* ------- STRUCTS ------- */
 /* Initial communication handshake */
@@ -73,12 +91,20 @@ struct RGBcolor
 };
 
 /* Gyroscope info encapsulation */
-struct IMUData
+typedef struct IMUData
 {
-  uint8_t x;
-  uint8_t y;
-  uint8_t z;
-};
+  /* Position from 0 - 360 */
+  int8_t xPos; /* roll */
+  int8_t yPos; /* pitch*/
+  int8_t zPos; /* jaw */
+  int8_t xSpeed;
+  int8_t ySpeed;
+  int8_t zSpeed;
+  int8_t xAcc;
+  int8_t yAcc;
+  int8_t zAcc; 
+  // TODO : do we need for every access
+}IMUData;
 
 /* Lamp main shared memory */
 struct stick_status
@@ -97,6 +123,7 @@ struct stick_status
   uint32_t effect_speed; //Effect speed
   uint32_t effect_amount; //Generic configuration parameter available for different effects. Meaning may vary.  
   system_state_var sysState; //System state
+  IMUData imuData;
 };
 
 #endif

@@ -62,17 +62,19 @@ struct bt_gyroscope_msg
   uint8_t x;
   uint8_t y;
   uint8_t z;
-}
+};
 
 /* */
 struct MyReceivedData
 {
-  bt_mode_msg* ptrMode = null;
-  bt_color_msg* ptrColor = null;
-  bt_intensity_msg* ptrIntensity = null;
-  bt_config_msg* ptrConfig = null;
-  bt_image_msg* ptrImage = null;
-}
+  bt_mode_msg* ptrMode = NULL;
+  bt_color_msg* ptrColor = NULL;
+  bt_intensity_msg* ptrIntensity = NULL;
+  bt_config_msg* ptrConfig = NULL;
+  bt_image_msg* ptrImage = NULL;
+};
 
+/* Global variable */
+extern MyReceivedData* ptrMyReceivedData; 
 
 #endif
