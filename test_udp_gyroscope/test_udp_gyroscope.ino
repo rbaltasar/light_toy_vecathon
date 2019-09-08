@@ -3,6 +3,7 @@
 #include <rom/rtc.h>
 # include <WiFi.h>
 #include "UDPHandler.h"
+#include "MPU9250_SensorValues.h"
 #include "network_credentials.h"
 
 
@@ -12,9 +13,13 @@
 
 /* UDP communication handler */
 UDPHandler udp_handler;
+MPU9250_SensorValues mpu9250_sensorVal;
 
-
-
+typedef struct MPU9250_Struct
+{
+uint16_t mPos_x,mPos_y,mPos_z;
+uint16_t mAcc_x,mAcc_y,mAcc_z;
+}MPU_Struct;
 
 void setup()
 {
@@ -27,6 +32,9 @@ void setup()
 
   /* Start with MQTT communication. Create object */  
   udp_handler.configure();
+  MPU9250_Struct mpuStruct;
+  mpu9250_sensorVal.begin();
+  mpu9250_sensorVal.ReadMpuSensorValue(mpuStruct);
   udp_handler.begin();
 }
 
