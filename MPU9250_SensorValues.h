@@ -17,6 +17,7 @@ private:
   MPU9250 mpu;
   uint16_t pos_x, pos_y, pos_z;
   float acc_x, acc_y, acc_z;
+  float prevAcc_x, prevAcc_y, prevAcc_z;
   float vel_x, vel_y, vel_z;
   uint32_t prev_ms;
   void setup();
