@@ -61,9 +61,8 @@ public:
   void FireAnim(IMUData& imuData);
   void CampMonitor(byte red, byte green, byte blue, IMUData& imuData);
   void StrobeAnim(byte red, byte green, byte blue, IMUData& imuData);
-   
+  void LEDNumberChangingWithPosition(byte red, byte green, byte blue, IMUData& imuData);
 
-  void HalloweenEyes(byte red, byte green, byte blue, int EyeWidth, int EyeSpace, bool Fade, int Steps, int FadeDelay, int EndPause);
   void Twinkle(byte red, byte green, byte blue, int Count, int SpeedDelay, bool OnlyOne);
 
   void SnowSparkle(byte red, byte green, byte blue, int SparkleDelay, int SpeedDelay);

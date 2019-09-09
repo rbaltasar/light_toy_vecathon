@@ -175,6 +175,38 @@ void LEDAnimatedEffects::ColorChangingWithPosition(IMUData& imuData)
   showStrip();
 }
 
+void LEDAnimatedEffects::LEDNumberChangingWithPosition(byte red, byte green, byte blue, IMUData& imuData)
+{
+  uint8_t numLeds = 0;
+  uint8_t calcZ = imuData.zPos / 2;
+  
+  RGBcolor mycolor;
+  mycolor.R = red;
+  mycolor.G = green;
+  mycolor.B = blue;
+
+
+  if(calcZ < 1)
+  {
+    numLeds = 1;   
+  }
+  else if(calcZ > NUM_LEDS)
+  {
+    numLeds = NUM_LEDS;
+  }
+  else
+  {
+    numLeds = calcZ;
+  }
+
+  Serial.println(numLeds);
+  Serial.println(calcZ);
+  
+  setLeds(mycolor,0,numLeds,true);
+  
+  showStrip();
+}
+
 /* Set a defined number of LEDs with the same color, with or without erasing the non-set leds */
 void LEDAnimatedEffects::setLeds(RGBcolor color, unsigned long delay_ms, uint8_t num_leds, bool erase_others)
 {
@@ -298,6 +330,24 @@ void LEDAnimatedEffects::TwinkleAnim(byte red, byte green, byte blue, int Count,
 
   unsigned long now = millis();
   int i;
+  int leds_velocity, calcVelocity = 0;
+
+
+  calcVelocity = 5*imuData.xVelocity + 5*imuData.yVelocity;
+  if(calcVelocity < 0)
+  {
+    leds_velocity = 1;
+  }
+  else if(calcVelocity > NUM_LEDS)
+  {
+    leds_velocity = NUM_LEDS;
+  }
+  else
+  {
+    leds_velocity = calcVelocity;
+  }
+
+  
   if(start_sequence)
   {
     i = 0;
@@ -315,7 +365,7 @@ void LEDAnimatedEffects::TwinkleAnim(byte red, byte green, byte blue, int Count,
 
     if(i < imuData.xPos)
     {
-      setPixel(random(NUM_LEDS),red,green,blue);
+      setPixel(leds_velocity,red,green,blue);
       showStrip();
       i++;
     }
@@ -369,7 +419,7 @@ void LEDAnimatedEffects::FireAnim(IMUData& imuData)
 
   unsigned long now = millis();
 
-  if((now - m_last_iteration) > imuData.yAcc)
+  if((now - m_last_iteration) > imuData.yPos)
   {
 
     m_last_iteration = now;
@@ -392,7 +442,7 @@ void LEDAnimatedEffects::FireAnim(IMUData& imuData)
     }
 
     // Step 3.  Randomly ignite new 'sparks' near the bottom
-    if( random(255) < imuData.yPos ) {
+    if( random(255) < imuData.zPos ) {
       int y = random(7);
       heat[y] = heat[y] + random(160,255);
       //heat[y] = random(160,255);

@@ -176,6 +176,9 @@ void LEDController::feed()
        case CAMP_MONITOR:
         m_animated_effects->CampMonitor(m_stick_status_request->color.R, m_stick_status_request->color.G, m_stick_status_request->color.B, m_stick_status_request->imuData);
         break;
+       case NUMBER_LEDS_POSITION: 
+        m_animated_effects->LEDNumberChangingWithPosition(m_stick_status_request->color.R, m_stick_status_request->color.G, m_stick_status_request->color.B, m_stick_status_request->imuData);
+        break;
     }
   }  
 }

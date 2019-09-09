@@ -59,6 +59,7 @@ enum AnimatedMode
   FIRE_ANIM = 207,
   CAMP_MONITOR = 208,
   STROBE_ANIM = 209,
+  NUMBER_LEDS_POSITION = 210,
   //BLOOD_SWORD_YAW = 205,
   /* Influence the Bluetooth Image*/
   FASTER_HOTTER = 250,
