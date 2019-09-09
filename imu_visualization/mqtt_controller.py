@@ -3,7 +3,7 @@ import paho.mqtt.client as paho
 import json
 from datetime import datetime
 
-BROKER_IP = "192.168.0.94"
+BROKER_IP = "192.168.0.121"
 BROKER_PORT = 1883
 
 class MQTTController:
