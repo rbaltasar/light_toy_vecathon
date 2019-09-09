@@ -21,7 +21,6 @@ LEDController LED_controller(&stick_state.val);
 
 /* MPU object */
 MPU9250_SensorValues mpu9250_sensorVal;
-MPU9250_Struct mpuStruct;
 /* Gesture recognition object */
 
 /* Communication controller */
@@ -46,7 +45,7 @@ void setup()
   setup_communication();
 
   /* Initial configuration of the stick when the system is booted */
-  stick_state.val.stick_mode =  208; //10 + STROBE;
+  stick_state.val.stick_mode =  200; //10 + STROBE;
   stick_state.val.color.R = 0;
   stick_state.val.color.G = G_DEFAULT;
   stick_state.val.color.B = 0;
@@ -56,11 +55,14 @@ void setup()
   stick_state.val.effect_amount = 1;
   stick_state.val.sysState = STARTUP;
   stick_state.val.imuData.xPos = 0;
-  stick_state.val.imuData.xSpeed = 0;
+  stick_state.val.imuData.xVelocity = 0;
+  stick_state.val.imuData.xAcc = 0;
   stick_state.val.imuData.yPos = 0;
-  stick_state.val.imuData.ySpeed = 0;
+  stick_state.val.imuData.yVelocity = 0;
+  stick_state.val.imuData.yAcc = 0;
   stick_state.val.imuData.zPos = 0;
-  stick_state.val.imuData.zSpeed = 0;
+  stick_state.val.imuData.zVelocity = 0;
+  stick_state.val.imuData.zAcc = 0;
 
   /* Same configuration for the "old" variable. TODO: create copy operator */
   stick_state.old.stick_mode = 99;
@@ -72,11 +74,14 @@ void setup()
   stick_state.old.effect_speed = 50; 
   stick_state.old.effect_amount = 1;
   stick_state.old.imuData.xPos = 0;
-  stick_state.old.imuData.xSpeed = 0;
+  stick_state.old.imuData.xVelocity = 0;
   stick_state.old.imuData.yPos = 0;
-  stick_state.old.imuData.ySpeed = 0;
+  stick_state.old.imuData.yVelocity = 0;
   stick_state.old.imuData.zPos = 0;
-  stick_state.old.imuData.zSpeed = 0;  
+  stick_state.old.imuData.zVelocity = 0; 
+  stick_state.old.imuData.xAcc = 0;
+  stick_state.old.imuData.yAcc = 0;
+  stick_state.old.imuData.zAcc = 0; 
 
   /* Init state */
 
@@ -229,25 +234,25 @@ void loop()
     stick_state.val.imuData.yPos = 
     stick_state.val.imuData.zPos = 
 
-    stick_state.val.imuData.xSpeed =
-    stick_state.val.imuData.ySpeeds =
-    stick_state.val.imuData.zSpeedPos =
+    stick_state.val.imuData.xVelocity =
+    stick_state.val.imuData.yVelocitys =
+    stick_state.val.imuData.zVelocityPos =
     */
     stick_state.val.color.R = ptrMyReceivedData->ptrColor->color.R;
     stick_state.val.color.G = ptrMyReceivedData->ptrColor->color.G;
     stick_state.val.color.B = ptrMyReceivedData->ptrColor->color.B;
     stick_state.val.brightness = ptrMyReceivedData->ptrIntensity->intensity;
   
-   // stick_state.val.imuData.xSpeed = 400;
+   // stick_state.val.imuData.xVelocity = 400;
      
     if((directionPosition == 0) && (stick_state.val.imuData.xPos < 360))
     {
       stick_state.val.imuData.xPos++;
       stick_state.val.imuData.yPos++;
       stick_state.val.imuData.zPos++;
-      stick_state.val.imuData.xSpeed++;
-      stick_state.val.imuData.ySpeed=+3;
-      stick_state.val.imuData.zSpeed=+2;
+      stick_state.val.imuData.xVelocity++;
+      stick_state.val.imuData.yVelocity=+3;
+      stick_state.val.imuData.zVelocity=+2;
       if(stick_state.val.imuData.xPos == 360)
       {
         directionPosition = 1;
@@ -256,13 +261,13 @@ void loop()
     else if( directionPosition == 1)
     {
       Serial.print("MIN Speed of Stick: ");
-      Serial.println(stick_state.val.imuData.xSpeed);
+      Serial.println(stick_state.val.imuData.xVelocity);
       stick_state.val.imuData.xPos--;
       stick_state.val.imuData.yPos--;
       stick_state.val.imuData.zPos--;
-      stick_state.val.imuData.xSpeed--;
-      stick_state.val.imuData.ySpeed=-2;
-      stick_state.val.imuData.ySpeed=-3;
+      stick_state.val.imuData.xVelocity--;
+      stick_state.val.imuData.yVelocity=-2;
+      stick_state.val.imuData.yVelocity=-3;
       if(stick_state.val.imuData.xPos == 0)
       {
         directionPosition = 0;

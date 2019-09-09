@@ -58,7 +58,7 @@ enum AnimatedMode
   TWINKLE_RANDOM_WITH_SPEED = 206,
   FIRE_ANIM = 207,
   CAMP_MONITOR = 208,
-  
+  STROBE_ANIM = 209,
   //BLOOD_SWORD_YAW = 205,
   /* Influence the Bluetooth Image*/
   FASTER_HOTTER = 250,
@@ -91,9 +91,9 @@ typedef struct IMUData
   uint16_t xPos; /* roll */
   uint16_t yPos; /* pitch*/
   uint16_t zPos; /* jaw */
-  uint16_t xSpeed;
-  uint16_t ySpeed;
-  uint16_t zSpeed;
+  float xVelocity;
+  float yVelocity;
+  float zVelocity;
   float xAcc;
   float yAcc;
   float zAcc; 

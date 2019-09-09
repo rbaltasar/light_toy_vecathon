@@ -26,27 +26,14 @@ void LEDAnimatedEffects::end_effect()
  */
 void LEDAnimatedEffects::FadeInOut(byte red, byte green, byte blue, IMUData& imuData)
 {
-
   int k,order;
-  uint16_t postitonS = imuData.xPos;
+  int16_t postitonS = imuData.xPos ;
   Serial.print("PostitonS: ");
   Serial.println(postitonS);
    
-  if(start_sequence)
-  {
-    k = 0;
-    order = 0;
-    start_sequence = false;
-  }
-  else
-  {
-    k = m_effect_state[0];
-    order = m_effect_state[1];
-  }
-  
   float r, g, b, relativePostion;
   /* Exponencial change */
-  relativePostion = (pow(postitonS, 2))/8; //*(postitonS / 1.42);
+  relativePostion = (pow(postitonS, 3))/400; //(postitonS / 1.42);
   
   k = relativePostion;
   
@@ -64,9 +51,69 @@ void LEDAnimatedEffects::FadeInOut(byte red, byte green, byte blue, IMUData& imu
   setAll(r,g,b);
   showStrip();
 
-  m_effect_state[0] = k;
+}
+
+void LEDAnimatedEffects::StrobeAnim(byte red, byte green, byte blue, IMUData& imuData)
+{
+
+  unsigned long now = millis();
+  int j,order;
+  int16_t StrobeCount = imuData.yPos;
+  float flashCalc = (float)((imuData.xAcc + imuData.yAcc + imuData.zAcc));
+  int16_t FlashDelay = int16_t (1000 - (float)flashCalc);
+
+  Serial.print("FlashDelay ");
+  Serial.println(FlashDelay);
+
+  
+  if(start_sequence)
+  {
+    j = 0;
+    order = 0;
+    start_sequence = false;
+  }
+  else
+  {
+    j = m_effect_state[0];
+    order = m_effect_state[1];
+  }
+
+  if( ((now - m_last_iteration) > FlashDelay) && ( (order == 0) || (order == 1) ) )
+  {
+    m_last_iteration = now;
+
+    if(order == 0)
+    {
+      setAll(red,green,blue);
+      showStrip();
+      order = 1;
+    }
+    else if(order == 1)
+    {
+      setAll(0,0,0);
+      showStrip();
+      if(++j < StrobeCount) order = 0;
+      else
+      {
+        j = 0;
+        order = 2;
+      }
+    }
+  }
+
+  else if ( ((now - m_last_iteration) > 30) && (order == 2)  )
+  {
+    Serial.println("Running Strobe");
+    Serial.println(StrobeCount);
+    Serial.println(FlashDelay);
+    order = 0;
+  }
+
+
+  m_effect_state[0] = j;
   m_effect_state[1] = order;
 }
+
 
 /*
  * The colors of the rainbow will be displayed acording to the position
@@ -75,9 +122,11 @@ void LEDAnimatedEffects::FadeInOut(byte red, byte green, byte blue, IMUData& imu
 void LEDAnimatedEffects::RainbowFadeInOut(IMUData& imuData)
 {
   int s,p, rIntensity, gIntensity, bIntensity, rSaturation, gSaturation, bSaturation, rPixel, gPixel, bPixel;
-  uint16_t postitonS = imuData.xPos;
-  uint16_t accX = imuData.xAcc;
+  int16_t postitonS = imuData.xPos + imuData.yPos;
+  //float velocity = (imuData.xVelocity + imuData.yVelocity )/2;
+  float acc = (imuData.xAcc + imuData.yAcc )/2;
   byte *c, *cs; 
+
   
   if(start_sequence)
   {
@@ -94,7 +143,7 @@ void LEDAnimatedEffects::RainbowFadeInOut(IMUData& imuData)
   float r, g, b, relativePostion;
   
   relativePostion = postitonS / 1.42;
-  s = accX;
+  s = acc;
  
   if(p < 256*5)
   {
@@ -423,7 +472,7 @@ void LEDAnimatedEffects::rainbowCycle(int SpeedDelay, IMUData& imuData)
   byte *c;
   int j;
   uint8_t pos = imuData.xPos;
-  uint8_t speed = imuData.xSpeed;
+  uint8_t speed = imuData.xVelocity;
 
   
   if(start_sequence)
