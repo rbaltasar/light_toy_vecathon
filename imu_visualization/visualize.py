@@ -12,7 +12,7 @@ from OpenGL.GLU import *
 from math import radians
 from pygame.locals import *
 
-SCREEN_SIZE = (1800, 1600)
+SCREEN_SIZE = (1400, 1000)
 SCALAR = .5
 SCALAR2 = 0.2
 
